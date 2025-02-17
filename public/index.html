@@ -30,7 +30,7 @@
             font-size: 18px;
         }
         .header img {
-           max-width: 50px;
+            max-width: 50px;
             height: auto;
             object-fit: scale-down;
             border-radius: 50%;
@@ -59,13 +59,26 @@
             align-self: flex-end;
             border: 1px solid #ddd;
         }
-        .stores-list {
-            padding-left: 20px;
+        .form-container, .store-list {
+            padding: 15px;
         }
-        .store-button {
+        .form-container label {
             display: block;
-            margin: 5px 0;
-            padding: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .form-container input, .form-container select {
+            width: 80%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .submit-button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
             background-color: #25D366;
             color: white;
             border: none;
@@ -73,6 +86,27 @@
             cursor: pointer;
             width: 100%;
             text-align: center;
+        }
+        .submit-button:hover {
+            background-color: #1da851;
+        }
+        .store-button {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #075e54;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .store-button:hover {
+            background-color: #064e45;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -94,35 +128,101 @@
                     <li>Pay your existing lay-by installment.</li>
                 </ul>
                 <br>
-                💬 Want to see all participating stores? Click below to get started!
-                <button class="store-button" onclick="showStores()">View Stores</button>
-            </div>
-            <div id="store-list" style="display: none;" class="message bot">
-                <strong>Participating PEP Stores in Malawi</strong> 🏬<br>
-                Below is the list of stores you can connect with. Click on a store to be directed to their WhatsApp page:
-                <ul class="stores-list" style="list-style-type: none; padding: 0;">
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre 1')">Blantyre 1</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre 2')">Blantyre 2</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre Chirchi')">Blantyre Chirchi</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre Haile Selassie Ave')">Blantyre Haile Selassie Ave</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 1')">Lilongwe 1 (Nico Centre)</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 2')">Lilongwe 2 (Gateway Mall)</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 3')">Lilongwe 3</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe Shoprite')">Lilongwe Shoprite</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Limbe 1')">Limbe 1</button></li>
-                    <li><button class="store-button" onclick="redirectToWhatsApp('Limbe 2')">Limbe 2 (New Market)</button></li>
-                </ul>
+                Please help us with some more details so that we can improve your experience...
             </div>
         </div>
+        <div class="form-container" id="formContainer">
+            <form id="userForm"></form>
+            <button class="submit-button" onclick="submitForm()">Submit</button>
+        </div>
+        <div class="store-list hidden" id="storeList">
+            <h3>Thank you! Now please select your preferred Store:</h3>
+            <div id="stores"></div>
+        </div>
     </div>
+
     <script>
-        function showStores() {
-            document.getElementById('store-list').style.display = 'block';
+        const questions = [
+            { key: "firstName", question: "Please enter your first name:", type: "text" },
+            { key: "lastName", question: "Now, enter your last name:", type: "text" },
+            { key: "existingCustomer", question: "Are you an existing PEP customer?", type: "select", options: ["Yes", "No"] },
+            { key: "registeredMyPEP", question: "Have you registered with MyPEP?", type: "select", options: ["Yes", "No"] },
+            { key: "email", question: "If not, please provide your email address.", type: "text", condition: (data) => data.registeredMyPEP === "No" },
+            { key: "queryType", question: "What type of query do you have?", type: "select", options: ["Purchase", "Lay-buy", "General enquiry"] },
+            { key: "queryDetails", question: "Please provide more details about your query.", type: "text" }
+        ];
+
+        const stores = [
+            "Blantyre 1", "Blantyre 2", "Blantyre Chichiri", "Blantyre Haile Selassie Avenue",
+            "Lilongwe 1 (Nico Centre)", "Lilongwe 2 (Gateway Mall)", "Lilongwe 3",
+            "Lilongwe Shoprite", "Limbe 1", "Limbe 2 (New Market)"
+        ];
+
+        const form = document.getElementById("userForm");
+        const formContainer = document.getElementById("formContainer");
+        const storeList = document.getElementById("storeList");
+        const storeButtons = document.getElementById("stores");
+        const formData = {};
+
+        function renderForm() {
+            form.innerHTML = ""; 
+            questions.forEach(q => {
+                const label = document.createElement("label");
+                label.textContent = q.question;
+                label.setAttribute("for", q.key);
+
+                let inputElement;
+                if (q.type === "select") {
+                    inputElement = document.createElement("select");
+                    inputElement.id = q.key;
+                    q.options.forEach(option => {
+                        const optionElement = document.createElement("option");
+                        optionElement.value = option;
+                        optionElement.textContent = option;
+                        inputElement.appendChild(optionElement);
+                    });
+                } else {
+                    inputElement = document.createElement("input");
+                    inputElement.type = q.type;
+                    inputElement.id = q.key;
+                }
+                inputElement.addEventListener("input", (event) => {
+                    formData[q.key] = event.target.value;
+                });
+                form.appendChild(label);
+                form.appendChild(inputElement);
+            });
         }
-        function redirectToWhatsApp(storeName) {
-            alert('Redirecting to WhatsApp for ' + storeName);
-            window.location.href = 'https://wa.me/27605673156?text=Hello, I want to connect with ' + encodeURIComponent(storeName);
+
+        function submitForm() {
+            formContainer.classList.add("hidden");
+            storeList.classList.remove("hidden");
+
+            storeButtons.innerHTML = "";
+            stores.forEach(store => {
+                const button = document.createElement("button");
+                button.textContent = store;
+                button.classList.add("store-button");
+                button.onclick = () => sendToWhatsApp(store);
+                storeButtons.appendChild(button);
+            });
         }
+
+        function sendToWhatsApp(store) {
+            const whatsappNumber = "+27605673156";
+            const message = `Hello PEP Malawi, my details are:
+- Name: ${formData.firstName} ${formData.lastName}
+- Existing Customer: ${formData.existingCustomer}
+- Registered with MyPEP: ${formData.registeredMyPEP}
+- Query Type: ${formData.queryType}
+- Query Details: ${formData.queryDetails}
+- Preferred Store: ${store}`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.location.href = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        }
+
+        renderForm();
     </script>
 </body>
 </html>
