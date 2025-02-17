@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEP Malawi - WhatsApp Connect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #075e54;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+        .header img {
+           max-width: 50px;
+            height: auto;
+            object-fit: scale-down;
+            border-radius: 50%;
+            margin-right: 10px;
+            order: -1;
+        }
+        .chat-box {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .bot {
+            background-color: #dcf8c6;
+            align-self: flex-start;
+        }
+        .user {
+            background-color: #fff;
+            align-self: flex-end;
+            border: 1px solid #ddd;
+        }
+        .stores-list {
+            padding-left: 20px;
+        }
+        .store-button {
+            display: block;
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <img src="pep.png" alt="PEP Logo">
+            <span>PEP Malawi</span>
+        </div>
+        <div class="chat-box">
+            <div class="message bot">
+                <strong>Welcome to PEP Malawi WhatsApp Page! ✨</strong><br>
+                Hi there! 😊 This platform is here to make your shopping easier.
+                <br><br>✅ <strong>What can you do here?</strong>
+                <ul>
+                    <li>Connect with your local PEP store.</li>
+                    <li>Enquire about stock availability.</li>
+                    <li>Place remote purchases or lay-bys.</li>
+                    <li>Pay your existing lay-by installment.</li>
+                </ul>
+                <br>
+                💬 Want to see all participating stores? Click below to get started!
+                <button class="store-button" onclick="showStores()">View Stores</button>
+            </div>
+            <div id="store-list" style="display: none;" class="message bot">
+                <strong>Participating PEP Stores in Malawi</strong> 🏬<br>
+                Below is the list of stores you can connect with. Click on a store to be directed to their WhatsApp page:
+                <ul class="stores-list" style="list-style-type: none; padding: 0;">
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre 1')">Blantyre 1</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre 2')">Blantyre 2</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre Chirchi')">Blantyre Chirchi</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Blantyre Haile Selassie Ave')">Blantyre Haile Selassie Ave</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 1')">Lilongwe 1 (Nico Centre)</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 2')">Lilongwe 2 (Gateway Mall)</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe 3')">Lilongwe 3</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Lilongwe Shoprite')">Lilongwe Shoprite</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Limbe 1')">Limbe 1</button></li>
+                    <li><button class="store-button" onclick="redirectToWhatsApp('Limbe 2')">Limbe 2 (New Market)</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showStores() {
+            document.getElementById('store-list').style.display = 'block';
+        }
+        function redirectToWhatsApp(storeName) {
+            alert('Redirecting to WhatsApp for ' + storeName);
+            window.location.href = 'https://wa.me/27605673156?text=Hello, I want to connect with ' + encodeURIComponent(storeName);
+        }
+    </script>
+</body>
+</html>
